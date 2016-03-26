@@ -42,3 +42,17 @@ printf "Real name: "
 read real_name
 
 verifyInputs
+
+# start connection and listen for responses
+exec 3<>"/dev/tcp/$server/$port"
+
+printInputs
+
+while read -r line; do
+    if [[ "$line" =~ ^"PING " ]];
+    then
+        printf >&3 '%s\r\n' "{line/PING/PONG}"
+    else
+        printf '%s\n' "$line"
+    fi
+done
